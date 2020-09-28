@@ -1,6 +1,6 @@
 #pragma once
 
-#define CUSTOM_STRING_VIEW 1
+#define CUSTOM_STRING_VIEW 0
 
 #if __cplusplus >= 201703L
 #if defined(__has_include)
@@ -17,7 +17,7 @@ using string_view = experimental::string_view;
 #endif
 #endif
 
-#ifdef CUSTOM_STRING_VIEW
+#if 0 //#ifdef CUSTOM_STRING_VIEW
 
 #include <endian.h>
 

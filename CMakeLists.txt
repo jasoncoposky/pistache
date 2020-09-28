@@ -1,9 +1,26 @@
 cmake_minimum_required (VERSION 3.1.3)
-project (pistache)
+
+find_package(IRODS 4.2.8 EXACT REQUIRED)
+
+set(CMAKE_C_COMPILER /opt/irods-externals/clang6.0-0/bin/bin/clang)
+set(CMAKE_CXX_COMPILER /opt/irods-externals/clang6.0-0/bin/bin/clang++)
+set(CMAKE_EXE_LINKER_FLAGS_INIT "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-missing-field-initializers")
+
+project(pistache)
+
+#add_compile_options(-nostdinc++ -Wall -Wextra -Werror -Wno-unused-parameter)
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH ${IRODS_EXTERNALS_FULLPATH_CLANG_RUNTIME}/lib)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+add_compile_options(-nostdinc++ -Wall -Wextra -Wno-unused-parameter)
+link_libraries(c++abi)
+
+include_directories(${IRODS_EXTERNALS_FULLPATH_CLANG}/include/c++/v1)
 
 include(GNUInstallDirs)
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -Wno-missing-field-initializers")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -54,30 +71,33 @@ endif()
 
 # CMAKE version less than 3.8 does not understand the CMAKE_CXX_FLAGS
 # set to 17, so a manual check if performed on older version
-if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
-    include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
-    if(COMPILER_SUPPORTS_CXX17)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-    else()
-        set(CMAKE_CXX_STANDARD 14)
-    endif()
-else()
-    # Old versions of Clang export C++17 in std::experimental namespace (tested on Clang 5 and 6).
-    # This gives an error on date.h external library.
-    # Following workaround forces Clang <= 6 to compile at best with C++14
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0.0))
-        set(CMAKE_CXX_STANDARD 14)
-    elseif (CMAKE_COMPILER_IS_GNUCC)
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-            set(CMAKE_CXX_STANDARD 17)
-        else()
-            set(CMAKE_CXX_STANDARD 14)
-        endif()
-    else()
-        set(CMAKE_CXX_STANDARD 17)
-    endif()
-endif()
+#if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
+#    include(CheckCXXCompilerFlag)
+#    CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+#    if(COMPILER_SUPPORTS_CXX17)
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#    else()
+#        set(CMAKE_CXX_STANDARD 14)
+#    endif()
+#else()
+#    # Old versions of Clang export C++17 in std::experimental namespace (tested on Clang 5 and 6).
+#    # This gives an error on date.h external library.
+#    # Following workaround forces Clang <= 6 to compile at best with C++14
+#    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0.0))
+#        set(CMAKE_CXX_STANDARD 14)
+#    elseif (CMAKE_COMPILER_IS_GNUCC)
+#        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
+#            set(CMAKE_CXX_STANDARD 17)
+#        else()
+#            set(CMAKE_CXX_STANDARD 14)
+#        endif()
+#    else()
+#        set(CMAKE_CXX_STANDARD 17)
+#    endif()
+#endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
