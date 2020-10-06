@@ -1,6 +1,6 @@
 #pragma once
 
-#define CUSTOM_STRING_VIEW 1
+#define CUSTOM_STRING_VIEW 0
 
 #if __cplusplus >= 201703L
 #if defined(__has_include)
